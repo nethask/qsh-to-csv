@@ -3,6 +3,7 @@ var Readers = require('./readers')
 var { TypesMap } = require('./readers/constants')
 var { showFlagsStat } = require('./readers/utils')
 var FileReader = require('./data-reader')
+var candlesGenerator = require('./candles-gen')
 
 function readHeader(file) {
   file.readConstStr('QScalp History Data')
@@ -47,7 +48,7 @@ function parseFile() {
      console.log(frameHeader);
      console.log(streamType)
      const dataProcessor = Readers[streamType];
-     dataProcessor(file, data);
+     dataProcessor(file, data, candlesGenerator('candles.csv', 60));
      showFlagsStat(data)
   })
   

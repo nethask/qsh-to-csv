@@ -1,7 +1,7 @@
 var { A, F } = require('./constants')
 var { setData } = require('./utils')
 
-function readOrdLogStep(file, data) {
+function readOrdLogStep(file, data, stepCallback) {
   let flags = file.readByte()
   let operFlags = file.readUInt16()
   for(var i = 0; i < 16; i++) { if(operFlags & 1 << i) data.ffcount[i]++ }
@@ -20,14 +20,15 @@ function readOrdLogStep(file, data) {
     if (A.PriceFilled & flags) { setData(data, 'price_filled', +file.readLeb()) }
     if (A.OpenInterest & flags) { setData(data, 'open_interest', +file.readLeb()) }
   }
+  stepCallback(data, flags, operFlags)
 }
 
-function readOrdLog(file, data) {
+function readOrdLog(file, data, stepCallback) {
   data.fcount = {}
   data.ffcount = Array(16).fill(0)
   data.records = 0
   while(true) {
-    readOrdLogStep(file, data)
+    readOrdLogStep(file, data, stepCallback)
     data.records++
     if (file.isEnd()) {
       break;
